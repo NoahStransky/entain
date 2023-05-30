@@ -12,6 +12,12 @@ service Racing {
 
 /* Requests/Responses */
 
+// Race status enum.
+enum RaceStatus {
+  OPEN = 0;
+  CLOSED = 1;
+}
+
 message ListRacesRequest {
   ListRacesRequestFilter filter = 1;
 }
@@ -25,8 +31,8 @@ message ListRacesResponse {
 message ListRacesRequestFilter {
   repeated int64 meeting_ids = 1;
   optional bool visible = 2;
-  // the order by clause, which needs to follow sql order by syntax,
-  // e.g. "id desc, name asc"
+  // The order by clause, which needs to follow sql order by syntax,
+  // E.g. "id desc, name asc"
   string order_by = 3;
 }
 
@@ -46,5 +52,8 @@ message Race {
   bool visible = 5;
   // AdvertisedStartTime is the time the race is advertised to run.
   google.protobuf.Timestamp advertised_start_time = 6;
+  // Status is derived based on AdvertisedStartTime and the current time.
+  // When AdvertisedStartTime is in the past should be "CLOSED", otherwise be "OPEN".
+  RaceStatus status = 7;
 }
 
