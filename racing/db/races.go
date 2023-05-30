@@ -120,6 +120,10 @@ func (m *racesRepo) scanRaces(
 
 		race.AdvertisedStartTime = ts
 
+		if advertisedStart.Before(time.Now()) {
+			race.Status = *racing.RaceStatus_CLOSED.Enum()
+		}
+
 		races = append(races, &race)
 	}
 
