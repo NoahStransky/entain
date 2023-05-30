@@ -29,6 +29,9 @@ message ListRacesResponse {
 message ListRacesRequestFilter {
   repeated int64 meeting_ids = 1;
   optional bool visible = 2;
+  // the order by clause, which needs to follow sql order by syntax,
+  // e.g. "id desc, name asc"
+  string order_by = 3;
 }
 
 /* Resources */
