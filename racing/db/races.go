@@ -89,6 +89,10 @@ func (r *racesRepo) applyFilter(query string, filter *racing.ListRacesRequestFil
 		query += " WHERE " + strings.Join(clauses, " AND ")
 	}
 
+	if filter.OrderBy != "" {
+		query += " ORDER BY " + filter.GetOrderBy()
+	}
+
 	return query, args
 }
 
