@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -19,6 +21,9 @@ type RacesRepo interface {
 
 	// List will return a list of races.
 	List(filter *racing.ListRacesRequestFilter) ([]*racing.Race, error)
+
+	// Get will return a race by ID.
+	Get(id int64) (*racing.Race, error)
 }
 
 type racesRepo struct {
@@ -41,6 +46,29 @@ func (r *racesRepo) Init() error {
 	})
 
 	return err
+}
+
+func (r *racesRepo) Get(id int64) (*racing.Race, error) {
+	var (
+		err   error
+		query string
+	)
+
+	query = getRaceQueries()[raceGet]
+
+	rows, err := r.db.Query(query, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	races, err := r.scanRaces(rows)
+
+	if len(races) == 0 {
+		return nil, errors.New(fmt.Sprintf("id: %d not found", id))
+	}
+
+	return races[0], err
 }
 
 func (r *racesRepo) List(filter *racing.ListRacesRequestFilter) ([]*racing.Race, error) {
