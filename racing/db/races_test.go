@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
@@ -70,4 +71,40 @@ func TestRacesRepoList(t *testing.T) {
 	assert.Equal(t, "test4", races[0].Name, "Unexpected name")
 	assert.Equal(t, racing.RaceStatus_OPEN.Enum().String(), races[0].Status.String(), "Unexpected open status")
 	assert.Equal(t, racing.RaceStatus_CLOSED.Enum().String(), races[1].Status.String(), "Unexpected close status")
+}
+
+func TestRacesRepoGet(t *testing.T) {
+	// Create a test database connection
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	// Initialize the races repository
+	repo := NewRacesRepo(db)
+	err = seed(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a request with id 1.
+	var successId int64 = 1
+	// Create a request with id 999.
+	var errorId int64 = 999
+
+	// Call the Get method with a valid id
+	race, err := repo.Get(successId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Call the Get method with an invalid id
+	errorRace, errInfo := repo.Get(errorId)
+
+	// Assert with the right response
+	assert.Equal(t, successId, race.Id, "Unexpected id")
+	assert.Equal(t, "test1", race.Name, "Unexpected name")
+	// Assert with the right error
+	assert.Equal(t, fmt.Sprintf("id: %d not found", errorId), errInfo.Error(), "Unexpected error")
+	assert.Equal(t, (*racing.Race)(nil), errorRace, "Unexpected race")
 }
