@@ -1,0 +1,50 @@
+syntax = "proto3";
+package sports;
+
+option go_package = "/sports";
+
+import "google/protobuf/timestamp.proto";
+
+service Sports {
+  // ListEvents will return a collection of all events.
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {}
+}
+
+/* Requests/Responses */
+
+message ListEventsRequest {
+  ListEventsRequestFilter filter = 1;
+}
+
+// Response to ListEvents call.
+message ListEventsResponse {
+  repeated Event events = 1;
+}
+
+// Filter for listing events.
+message ListEventsRequestFilter {
+  repeated int64 meeting_ids = 1;
+  optional bool visible = 2;
+  // The order by clause, which needs to follow sql order by syntax,
+  // E.g. "id desc, name asc"
+  string order_by = 3;
+}
+
+/* Resources */
+
+// A event resource.
+message Event {
+  // ID represents a unique identifier for the event.
+  int64 id = 1;
+  // MeetingID represents a unique identifier for the sports meeting.
+  int64 meeting_id = 2;
+  // Name is the official name given to the event.
+  string name = 3;
+  // Visible is whether the event is visible.
+  bool visible = 4;
+  // AdvertisedStartTime is the time the event is advertised to run.
+  google.protobuf.Timestamp advertised_start_time = 5;
+  // Description is the description of the event.
+  string description = 6;
+}
+
